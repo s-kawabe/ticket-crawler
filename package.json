@@ -1,25 +1,30 @@
 {
-  "name": "ticket-crawler",
-  "type": "module",
-  "version": "0.0.1",
-  "scripts": {
-    "dev": "astro dev",
-    "start": "astro dev",
-    "build": "astro check && astro build",
-    "preview": "astro preview",
-    "astro": "astro",
-    "lint": "biome lint --apply ./",
-    "lint-unsafe": "biome lint --apply-unsafe ./",
-    "format": "biome format --write ./"
-  },
-  "dependencies": {
-    "@astrojs/check": "^0.3.1",
-    "astro": "^4.0.3",
-    "typescript": "^5.3.3"
-  },
-  "devDependencies": {
-    "@biomejs/biome": "1.4.1",
-    "axios": "1.6.2",
-    "playwright": "1.40.1"
-  }
+	"name": "ticket-crawler",
+	"type": "module",
+	"version": "0.0.1",
+	"scripts": {
+		"dev": "astro dev",
+		"start": "astro dev",
+		"build": "astro check && astro build",
+		"preview": "astro preview",
+		"astro": "astro",
+		"lint": "biome lint --apply ./",
+		"lint-unsafe": "biome lint --apply-unsafe ./",
+		"format": "biome format --write ./",
+		"crawl": "./node_modules/.bin/ts-node --esm ./script/crawl.ts"
+	},
+	"dependencies": {
+		"@astrojs/check": "^0.3.1",
+		"astro": "^4.0.3",
+		"typescript": "^5.3.3"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "1.4.1",
+		"@types/axios": "0.14.0",
+		"@types/node": "18.11.9",
+		"axios": "1.6.2",
+		"playwright": "1.40.1",
+		"querystring": "0.2.1",
+		"ts-node": "10.9.2"
+	}
 }
