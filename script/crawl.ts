@@ -1,43 +1,88 @@
-import { chromium } from 'playwright';
+import { chromium, type Browser, type Locator, type Page } from 'playwright';
 import readline from 'readline';
 import fs from 'fs';
 import axios from 'axios';
-import querystring from 'querystring';
+import FormData from 'form-data';
 import { validURL } from './utils.js';
 
 const LINE_API_TOKEN = 'NcuPqEuEIUxrJTvLooSl70HO9noTG4QPMaFPWE740Jh';
 
+const loopCheckTicketCards = async ({
+  elements,
+  browser,
+  page,
+  expectedTexts,
+}: {
+  elements: Locator;
+  browser: Browser;
+  page: Page;
+  expectedTexts: string[];
+}): Promise<boolean> => {
+  if ((await elements.count()) === 0) {
+    return false;
+  }
+
+  for (let i = 0; i < (await elements.count()); i++) {
+    const element = elements.nth(i);
+    const textbox = element.locator('.item_result_box .item_result_box_msg');
+    for (const text of expectedTexts) {
+      const stringTextbox = await textbox.innerHTML();
+      if (stringTextbox.includes('２階') && stringTextbox.includes(text)) {
+        try {
+          console.log('チケットが見つかりました！ LINEに画像を送るゾウ🐘');
+          await element.screenshot({ path: './script/assets/ticket.png' });
+          await element.click();
+          const form = new FormData();
+          form.append('imageFile', fs.createReadStream('script/assets/ticket.png'));
+          form.append('message', `リセールで希望のチケットが出てるよ！🐘\n${page.url()}`);
+          await axios({
+            method: 'post',
+            url: 'https://notify-api.line.me/api/notify',
+            headers: {
+              ...form.getHeaders(),
+              Authorization: `Bearer ${LINE_API_TOKEN}`,
+            },
+            data: form,
+          });
+
+          await browser.close();
+          return true;
+        } catch (err) {
+          console.error(err);
+          return false;
+        }
+      }
+    }
+  }
+  return false;
+};
+
 const runCrawlPia = async (url: string, expectedTexts: string[]) => {
   console.log('---------------------------------');
-  console.log('サイトを巡回します... 🐘');
+  console.log('サイトを巡回してくるゾウ〜 🐘');
   const browser = await chromium.launch({ headless: false });
   const context = await browser.newContext();
   const page = await context.newPage();
   await page.goto(url);
-  const element = await page.$('.item_result_wrapper ol:first-child');
-  if (element) {
-    try {
-      console.log('チケットが見つかりました！ LINEに画像を送るゾウ🐘');
-      await element.screenshot({ path: './script/assets/ticket.png' });
 
-      await axios({
-        method: 'post',
-        url: 'https://notify-api.line.me/api/notify',
-        headers: {
-          Authorization: `Bearer ${LINE_API_TOKEN}`,
-        },
-        data: querystring.stringify({
-          imageFile: '@script/assets/ticket.png',
-          message: 'リセールで希望のチケットが出てるよ！🐘',
-        }),
-      });
-    } catch (err) {
-      console.error(err);
+  while (true) {
+    const elements = page.locator('.item_result_wrapper ol');
+    const result = await loopCheckTicketCards({ elements, browser, page, expectedTexts });
+    if (result) {
+      await browser.close();
+      return;
     }
-  } else {
-    console.log('チケットが見つかりませんでした... 🐘');
+
+    const nextPage = page.locator('.pager_arr_last');
+    const hasNextPage = (await nextPage.count()) !== 0;
+    if (hasNextPage) {
+      await nextPage.click();
+    } else {
+      console.log('チケットが見つかりませんでした... 🐘');
+      await browser.close();
+      return;
+    }
   }
-  await browser.close();
 };
 
 (() => {
@@ -65,14 +110,7 @@ const runCrawlPia = async (url: string, expectedTexts: string[]) => {
         return;
       }
 
-      rl.question(
-        '探す対象の文字列を入力してね！複数指定する場合はカンマで区切ってください🐘（例: "1列", "1列,2列,3列"） > ',
-        async (expectedText) => {
-          console.log(url, expectedText);
-          await runCrawlPia(url, expectedText.split(','));
-          rl.close();
-        },
-      );
+      await runCrawlPia(url, ['３０扉']);
     },
   );
 })();
