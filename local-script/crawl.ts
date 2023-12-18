@@ -73,12 +73,6 @@ const runCrawlPia = async (url: string, expectedTexts: string[]) => {
     const elements = page.locator('.item_result_wrapper ol');
     const result = await loopCheckTicketCards({ elements, browser, page, expectedTexts });
 
-    // 一回条件に一致するものを見つけても最後まで走らせる
-    // if (result) {
-    //   await browser.close();
-    //   return;
-    // }
-
     await page.waitForTimeout(1000);
 
     const nextPage = page.locator('.pager_arr_last a');
