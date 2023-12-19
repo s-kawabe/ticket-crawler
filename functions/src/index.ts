@@ -52,7 +52,7 @@ const loopCheckTicketCards = async ({
             url: 'https://notify-api.line.me/api/notify',
             headers: {
               ...form.getHeaders(),
-              Authorization: `Bearer ${process.env.LINE_API_TOKEN}`,
+              Authorization: `Bearer ${process.env.lineApiToken}`,
             },
             data: form,
           });
