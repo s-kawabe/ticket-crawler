@@ -1,4 +1,4 @@
-import { chromium, type Browser, type Locator, type Page } from 'playwright-core';
+import { chromium, type Browser, type Locator, type Page } from 'playwright';
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
@@ -103,7 +103,7 @@ const runCrawlPia = async (url: string, expectedTexts: string[]) => {
  * ぴあのリセールページのURL (あらかじめ絞り込みを行った後の、クエリパラメータが色々追加された状態のもの)
  */
 const CLOAK_RESALE_URL =
-  'https://cloak.pia.jp/resale/item/list?areaCd=&prefectureCd=&hideprefectures=01&perfFromDate=2023%2F12%2F22&perfToDate=2023%2F12%2F22&numSht=2&priceFrom=&priceTo=&eventCd=&perfCd=&rlsCd=&lotRlsCd=52359%2C53668%2C64585&eventPerfCdList=&stkStkndCd=&stkCliCd=&invalidCondition=27981843%2C60701680%2C76910770&preAreaCd=&prePrefectureCd=&totalCount=83&beforeSearchCondition=%7B"event_cd"%3A""%2C"event_perf_cd_list"%3A""%2C"perf_cd"%3A""%2C"rls_cd"%3A""%2C"lot_rls_cd"%3A"52359%2C53668%2C64585"%2C"stk_stknd_cd"%3A""%2C"stk_cli_cd"%3A""%2C"invalid_condition"%3A"27981843%2C60701680%2C76910770"%2C"perf_from_date"%3A"2023%2F12%2F19"%2C"perf_to_date"%3A"2023%2F12%2F19"%2C"num_sht"%3A"2"%2C"price_from"%3A""%2C"price_to"%3A""%2C"sort_condition"%3A"entry_date_time%2Cdesc"%2C"page"%3A1%7D&ma_token=96r4j5mxIQ6JnHd&sortCondition=entry_date_time%2Cdesc';
+  'https://cloak.pia.jp/resale/item/list?areaCd=&prefectureCd=&hideprefectures=01&perfFromDate=2023%2F12%2F22&perfToDate=&numSht=2&priceFrom=&priceTo=&eventCd=2326012%2C2326013%2C2326014%2C2326015%2C2326016%2C2323152%2C2330550%2C2330540%2C2330743%2C2330491%2C2330492%2C2330493%2C2330708%2C2330536%2C2330586%2C2330856%2C2332972%2C2332973&perfCd=&rlsCd=&lotRlsCd=&eventPerfCdList=&stkStkndCd=&stkCliCd=&invalidCondition=&preAreaCd=&prePrefectureCd=&totalCount=11&beforeSearchCondition=%7B%22event_cd%22%3A%222326012%2C2326013%2C2326014%2C2326015%2C2326016%2C2323152%2C2330550%2C2330540%2C2330743%2C2330491%2C2330492%2C2330493%2C2330708%2C2330536%2C2330586%2C2330856%2C2332972%2C2332973%22%2C%22event_perf_cd_list%22%3A%22%22%2C%22perf_cd%22%3A%22%22%2C%22rls_cd%22%3A%22%22%2C%22lot_rls_cd%22%3A%22%22%2C%22stk_stknd_cd%22%3A%22%22%2C%22stk_cli_cd%22%3A%22%22%2C%22invalid_condition%22%3A%22%22%2C%22area_cd%22%3A%22%22%2C%22prefecture_cd%22%3A%22%22%2C%22perf_from_date%22%3A%222023%2F12%2F22%22%2C%22perf_to_date%22%3A%22%22%2C%22num_sht%22%3A%22%22%2C%22price_from%22%3A%22%22%2C%22price_to%22%3A%22%22%2C%22sort_condition%22%3A%22entry_date_time%2Cdesc%22%2C%22page%22%3A1%7D&ma_token=96r4j5mxIQ6JnHd&sortCondition=entry_date_time%2Cdesc#';
 
 /**
  * スケジュール実行されるメイン関数
@@ -111,8 +111,6 @@ const CLOAK_RESALE_URL =
 export const scheduledCrawlFunc = onSchedule('every 5 minutes', async (event) => {
   dumpExecuteLog();
 
-  console.time('crawl time');
   await runCrawlPia(CLOAK_RESALE_URL, ['XAﾌﾞﾛｯｸ', 'XBﾌﾞﾛｯｸ', 'XCﾌﾞﾛｯｸ']);
   await runCrawlPia(CLOAK_RESALE_URL, ['Aﾌﾞﾛｯｸ', 'Bﾌﾞﾛｯｸ', 'Cﾌﾞﾛｯｸ']);
-  console.timeEnd('crawl time');
 });
