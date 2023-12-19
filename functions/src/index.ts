@@ -6,6 +6,7 @@ import axios from 'axios';
 import FormData from 'form-data';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
 import { setGlobalOptions } from 'firebase-functions/v2';
+import { config } from 'firebase-functions';
 
 import { dumpExecuteLog } from './utils.js';
 
@@ -52,7 +53,7 @@ const loopCheckTicketCards = async ({
             url: 'https://notify-api.line.me/api/notify',
             headers: {
               ...form.getHeaders(),
-              Authorization: `Bearer ${process.env.line_api_token}`,
+              Authorization: `Bearer ${config().line.token}`,
             },
             data: form,
           });
